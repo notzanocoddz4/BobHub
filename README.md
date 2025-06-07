@@ -6,4 +6,3 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/notzanocoddz4/BobHub/
 ```
 ### Changelog:
 - [Click here to view changelog](https://github.com/notzanocoddz4/BobHub/blob/main/CHANGELOG.md)
-
