@@ -257,7 +257,9 @@ auto:CreateToggle({
 
             for i, v in pairs(Workspace:GetChildren()) do
                 if table.find(Get_Bosses, v.Name) then
-                    Punch:FireServer(ID, v, v:WaitForChild("HumanoidRootPart"))
+                    if v and v:FindFirstChild("HumanoidRootPart") then
+                        Punch:FireServer(ID, v, v:WaitForChild("HumanoidRootPart"))
+                    end
                 end
             end
             task.wait()
