@@ -14,7 +14,7 @@
 - add punch-aura
 - add punch-hit-delay
 - add player-hit-distance
-- add kill-boss (support name: Mushroom King, Scarecrow, Cat, Dog, Tree Lord)
+- add kill-boss ( support name: Mushroom King, Scarecrow, Cat, Dog, Tree Lord )
 
 #### anti tabs
 - add anti-void
