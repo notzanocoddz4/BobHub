@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 00.00.0000
+## 07/06/2025
 
 <img src="https://tr.rbxcdn.com/180DAY-d6f85fbe79e2416623e3140a597b9f32/768/432/Image/Webp/noFilter" style="width: 80%; height: 100%">
 
