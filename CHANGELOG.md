@@ -24,4 +24,4 @@
 
 #### misc tabs
 - add teleport-arena
-- add get badge ( get-backrooms, get-cake, get-boring, get-grocery-shopping)
+- add get badge ( get-backrooms, get-cake, get-boring, get-grocery-shopping )
