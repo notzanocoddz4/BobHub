@@ -5,7 +5,7 @@ local ID_tbl = { [8260276694] = true }
 
 local function load(id:number)
     local s, r = pcall(function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/notzanocoddz/BobHub/main/Place/".. id ..".lua"))()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/notzanocoddz4/BobHub/main/Place/".. id ..".lua"))()
     end)
     if s then
         print('successfully load script')
