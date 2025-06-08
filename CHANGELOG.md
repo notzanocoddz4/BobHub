@@ -13,7 +13,7 @@ __Features:__
 - fix walkspeed and jump toggle
 
 #### auto tabs
-- fix punch-aura ( ingore uno reverse )
+- fix punch-aura ( so i added ingore uno reverse )
 - fix punch-hit-delay ( set: 0.25 to 0.3 )
 - fix player-hit-distance ( set: 0 to 17 ) 20 distance will get banned
 - add kill-boss | ( 06/07/2025 )
