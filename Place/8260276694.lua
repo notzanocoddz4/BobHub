@@ -52,19 +52,19 @@ local IS_FLAGS = {
         -- ["target-player"] = false
     },
     ["auto"] = {
-        ["punch-hit-delay"] = 0.2,
-        ["player-hit-distance"] = 20,
+        ["punch-hit-delay"] = 0.25,
+        ["player-hit-distance"] = 17,
         ["punch-aura"] = false,
-        ["kill-boss"] = false
+        ["kill-boss"] = false,
     },
     ["anti"] = {
         ["anti-void"] = false,
     },
     ["visuals"] = {
-        ["disable-tag-name"] = false
+        ["disable-tag-name"] = false,
     },
     ["misc"] = {
-        ["teleport-arena"] = false
+        ["teleport-arena"] = false,
     }
 }
 
@@ -102,9 +102,13 @@ local Get_Bagde = {
         firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, MapItems.Cake, 1)
     end,
     Boring = function()
+        --[[
         firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, Secrets["Big Mushroom Hitbox"], 0)
         task.wait(0.1)
         firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, Secrets["Big Mushroom Hitbox"], 1)
+        cannot touch
+        ]]
+        LocalPlayer.Character:MoveTo(Secrets["Big Mushroom Hitbox"]:GetPivot().Position)
     end,
     GroceryShopping = function()
         for _, item in pairs(Items) do
@@ -139,7 +143,7 @@ player:CreateSlider({
    Name = "walkspeed-slider",
    Range = {0, 350},
    Increment = 10,
-   CurrentValue = IS_FLAGS["player"]["speed-slider"],
+   CurrentValue = 21,
    Callback = function(value)
         IS_FLAGS["player"]["speed-slider"] = value
    end
@@ -147,7 +151,7 @@ player:CreateSlider({
 
 player:CreateToggle({
    Name = "walkspeed-enable",
-   CurrentValue = IS_FLAGS["player"]["walkspeed-enable"],
+   CurrentValue = false,
    Callback = function(state)
         IS_FLAGS["player"]["walkspeed-enable"] = state
 
@@ -163,7 +167,7 @@ player:CreateSlider({
    Name = "jump-slider",
    Range = {0, 550},
    Increment = 10,
-   CurrentValue = IS_FLAGS["player"]["jump-slider"],
+   CurrentValue = 50,
    Callback = function(value)
         IS_FLAGS["player"]["jump-slider"] = value
    end
@@ -171,7 +175,7 @@ player:CreateSlider({
 
 player:CreateToggle({
    Name = "jump-enable",
-   CurrentValue = IS_FLAGS["player"]["jump-enable"],
+   CurrentValue = false,
    Callback = function(state)
         IS_FLAGS["player"]["jump-enable"] = state
 
@@ -189,7 +193,7 @@ player:CreateSection("ai")
 
 player:CreateToggle({
    Name = "target-player",
-   CurrentValue = IS_FLAGS["player"]["target-player"],
+   CurrentValue = false,
    Callback = function(state)
         IS_FLAGS["player"]["target-player"] = state
    end
@@ -202,9 +206,9 @@ auto:CreateSection("combat")
 
 auto:CreateSlider({
    Name = "player-hit-distance",
-   Range = {0, 20},
+   Range = {0, 17},
    Increment = 10,
-   CurrentValue = IS_FLAGS["auto"]["player-hit-distance"],
+   CurrentValue = 17,
    Callback = function(value)
         IS_FLAGS["auto"]["player-hit-distance"] = value
    end
@@ -212,9 +216,9 @@ auto:CreateSlider({
 
 auto:CreateSlider({
    Name = "punch-hit-delay",
-   Range = {0.2, 0.4},
+   Range = {0.25, 0.3},
    Increment = 10,
-   CurrentValue = IS_FLAGS["auto"]["punch-hit-delay"],
+   CurrentValue = 0.25,
    Callback = function(value)
         IS_FLAGS["auto"]["punch-hit-delay"] = value
    end
@@ -224,7 +228,7 @@ auto:CreateDivider()
 
 auto:CreateToggle({
    Name = "punch-aura",
-   CurrentValue = IS_FLAGS["auto"]["punch-aura"],
+   CurrentValue = false,
    Callback = function(state)
         IS_FLAGS["auto"]["punch-aura"] = state
 
@@ -233,11 +237,12 @@ auto:CreateToggle({
             for k, v in next, Players:GetPlayers() do
                 if v ~= LocalPlayer then
                     local Character = v.Character
-                    if Character and Character:FindFirstChild("HumanoidRootPart") then
+                                                                                    -- ingore uno reverse
+                    if Character and Character:FindFirstChild("HumanoidRootPart") and Character:FindFirstChild("Left Arm"):FindFirstChild("SelectionBox") == nil then
                         local distance = LocalPlayer:DistanceFromCharacter(v.Character.HumanoidRootPart.Position)
 
                         if distance <= IS_FLAGS["auto"]["player-hit-distance"] then
-                            Punch:FireServer(ID, Character, Character:WaitForChild("HumanoidRootPart"))   
+                            Punch:FireServer(ID, Character, Character:WaitForChild("HumanoidRootPart"))
                         end
                     end
                 end
@@ -248,7 +253,7 @@ auto:CreateToggle({
 
 auto:CreateToggle({
    Name = "kill-boss",
-   CurrentValue = IS_FLAGS["auto"]["kill-boss"],
+   CurrentValue = false,
    Callback = function(state)
         IS_FLAGS["auto"]["kill-boss"] = state
 
@@ -272,7 +277,7 @@ anti:CreateSection("anti")
 
 anti:CreateToggle({
    Name = "anti-void",
-   CurrentValue = IS_FLAGS["anti"]["anti-void"],
+   CurrentValue = false,
    Callback = function(state)
         IS_FLAGS["anti"]["anti-void"] = state
 
@@ -288,7 +293,7 @@ visuals:CreateSection("remove")
 
 visuals:CreateToggle({
    Name = "disable-tag-name",
-   CurrentValue = IS_FLAGS["visuals"]["disable-tag-name"],
+   CurrentValue = false,
    Callback = function(state)
         IS_FLAGS["visuals"]["disable-tag-name"] = state
         LocalPlayer.Character:WaitForChild("Head"):FindFirstChild("Name Tag").Enabled = not IS_FLAGS["visuals"]["disable-tag-name"]
@@ -300,12 +305,12 @@ misc:CreateSection("teleport")
 
 misc:CreateToggle({
    Name = "teleport-arena",
-   CurrentValue = IS_FLAGS["misc"]["teleport-arena"],
+   CurrentValue = false,
    Callback = function(state)
         IS_FLAGS["misc"]["teleport-arena"] = state
 
         while IS_FLAGS["misc"]["teleport-arena"] do
-            if LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
                 for i, v in pairs(Arena.Portal:GetChildren()) do
                     if v:IsA("TouchTransmitter") then
                         firetouchinterest(LocalPlayer.Character.HumanoidRootPart, v.Parent, 0)
@@ -385,7 +390,8 @@ LocalPlayer.CharacterAdded:Connect(function(character)
 end)
 
 RunService.RenderStepped:Connect(function()
-    if LocalPlayer.Character and LocalPlayer.Character.Humanoid.Health > 0 then
+    local Humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+    if Humanoid and Humanoid.Health > 0 then
         if IS_FLAGS["player"]["walkspeed-enable"] == true then
             LocalPlayer.Character.Humanoid.WalkSpeed = IS_FLAGS["player"]["speed-slider"]
         end
