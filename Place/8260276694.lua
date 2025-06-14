@@ -218,15 +218,6 @@ character:CreateToggle("no-clip", {
     end
 })
 
-character:CreateToggle("no-ragdoll", {
-    Title = "no-ragdoll",
-    Description = "", 
-    Default = false,
-    Callback = function(state)
-        IS_FLAGS["player"]["no-ragdoll"] = state
-    end
-})
-
 -- auto tabs
 local combat = tabs.auto:CreateSection("combat")
 
