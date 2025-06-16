@@ -2,6 +2,10 @@ if game.PlaceId ~= 8260276694 then
     return 
 end
 
+repeat
+    task.wait()
+until game:IsLoaded()
+
 local Library = loadstring(game:HttpGetAsync("https://github.com/ActualMasterOogway/Fluent-Renewed/releases/latest/download/Fluent.luau"))()
 local SaveManager = loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/ActualMasterOogway/Fluent-Renewed/master/Addons/SaveManager.luau"))()
 local InterfaceManager = loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/ActualMasterOogway/Fluent-Renewed/master/Addons/InterfaceManager.luau"))()
@@ -19,14 +23,15 @@ local Players = game:GetService('Players');
 local RunService = game:GetService('RunService');
 local ReplicatedStorage = game:GetService('ReplicatedStorage');
 local UserInputService = game:GetService('UserInputService');
---local PathfindingService = game:GetService('PathfindingService');
+local HttpService = game:GetService('HttpService');
+local PathfindingService = game:GetService('PathfindingService');
 local BadgeService = game:GetService('BadgeService');
 local TextChatService = game:GetService('TextChatService');
 local Workspace = game:GetService('Workspace');
 
 local LocalPlayer = Players.LocalPlayer
 local Backpack = LocalPlayer:WaitForChild('Backpack')
-local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+-- local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 local PlayerScripts = LocalPlayer:WaitForChild('PlayerScripts')
 
 -- module
@@ -42,7 +47,7 @@ local Punch = RemoteEvents.Punch
 
 local RBXGeneral = TextChatService.TextChannels.RBXGeneral
 
-local ID = 314159265359; -- but this is anti-exploit id
+local ID = 314159265359; -- i think this is the ID of anti-exploit, but i don't know what it does
 
 local IS_FLAGS = {
     ["player"] = {
@@ -50,9 +55,8 @@ local IS_FLAGS = {
         ["speed-enable"] = false,
         ["jump-slider"] = 50,
         ["jump-enable"] = false,
-        ["inf-jump"] = false,
+        ["no-ragdoll"] = false,
         ["no-clip"] = false,
-        -- ["no-ragdoll"] = false,
     },
     ["auto"] = {
         ["punch-hit-delay"] = 0.25,
@@ -64,6 +68,8 @@ local IS_FLAGS = {
     ["anti"] = {
         ["anti-void"] = false,
         ["anti-jello"] = false,
+        ["anti-slime"] = false,
+        ["anti-lava"] = false,
         -- ["anti-soap"] = false,
     },
     ["visuals"] = {
@@ -121,26 +127,64 @@ local Get_Bagde = {
     end
 }
 
-local Phrases_Chat = {
-    -- made by hqt but he didn't know make script, also i wanna thank you for help me mke toxic
+local Phrase_Chat = {
+    -- made by hqt and zano make pharases
     "you are no match for my skill, go cry to your daddy about losing",
     "you're useless and loud-bad combo.",
     "bozo with a big mouth and no skills.",
     "you are a bozo, just quit and go touch grass if you are so bad.",
     "ez, you are so bad that you make me want to cry.",
     "call admin for ban me, you are bozo",
+    "so ez, you are losing with advantages and youre gonna report me just because you cant beat me",
+    "you cant beat me even with good abilities, noob",
+    "you lost, stop crying.",
 }
 
 function get_bossesNames()
     local bossNames = {}
     for _, v in pairs(Bosses:GetChildren()) do
-        if v:IsA("Folder") then
-            table.insert(bossNames, v.Name)
-        end
+        table.insert(bossNames, v.Name)
     end
+
     return bossNames
 end
 
+function discord_Info() -- bobhub server
+    local url_inviteAPI = "https://discord.com/api/v9/invites/zr575byvYK?with_counts=true"
+    local request = (syn and syn.request) or (http and http.request) or (HttpService and HttpService.RequestAsync) or request
+
+    local content = ""
+    local success, result = pcall(function()
+        local response = request({
+            Url = url_inviteAPI,
+            Method = "GET",
+            Headers = {
+                ["Content-Type"] = "application/json"
+            }
+        })
+
+        if response.StatusCode == 200 then
+            local decoded = HttpService:JSONDecode(response.Body)
+            local server_Name = decoded["guild"] and decoded["guild"]["name"] or "Unknown"
+            local token = decoded["code"] or ""
+            local member_Count = decoded["approximate_member_count"] or 0
+            local online_Count = decoded["approximate_presence_count"] or 0
+
+            content = {
+                server_name = server_Name,
+                token = token,
+                member_count = member_Count,
+                online_count = online_Count
+            }
+        else
+            error("Failed to fetch Discord invite data: " .. response.Body)
+        end
+    end)
+
+    return content
+end
+
+-- Creating a window
 local Window = Library:CreateWindow({
     Title = "ability wars",
     SubTitle = "by bobhub",
@@ -153,14 +197,46 @@ local Window = Library:CreateWindow({
     MinimizeKey = Enum.KeyCode.RightControl
 })
 
+-- Creating a tabs of table
 local tabs = {
-    player = Window:CreateTab({ Title = "player", Icon = "" }),
-    auto = Window:CreateTab({ Title = "auto", Icon = "" }),
-    anti = Window:CreateTab({ Title = "anti", Icon = "" }),
-    visuals = Window:CreateTab({ Title = "visuals", Icon = "" }),
-    misc = Window:CreateTab({ Title = "misc", Icon = "" }),
-    settings = Window:CreateTab({ Title = "settings", Icon = "" })
+    about = Window:CreateTab({ Title = "about", Icon = "info" }),
+    player = Window:CreateTab({ Title = "player", Icon = "circle-user-round" }),
+    auto = Window:CreateTab({ Title = "auto", Icon = "zap" }),
+    anti = Window:CreateTab({ Title = "anti", Icon = "shield-ban" }),
+    visuals = Window:CreateTab({ Title = "visuals", Icon = "eye" }),
+    misc = Window:CreateTab({ Title = "misc", Icon = "folder-open" }),
+    settings = Window:CreateTab({ Title = "settings", Icon = "settings" })
 }
+
+-- about tabs
+local data = discord_Info()
+local discord_info = tabs.about:CreateSection("discord-information")
+
+discord_info:CreateParagraph("discord-info", {
+    Title = data.server_name,
+    Content = "online count: " .. data.online_count .. ", member count: " .. data.member_count,
+    TitleAlignment = "Middle",
+    ContentAlignment = Enum.TextXAlignment.Center
+})
+
+discord_info:CreateButton({
+   Title = "copy-discord-server",
+   Description = "",
+   Callback = function()
+        setclipboard("https://discord.gg/".. data.token)
+   end 
+})
+
+local credits = tabs.about:CreateSection("credits")
+
+credits:CreateParagraph("dev-credits", {
+    Title = "bobhub team (mmm)",
+    Content = [[
+    - notzanocoddz: owner & developer
+    ]],
+    TitleAlignment = "Left",
+    ContentAlignment = Enum.TextXAlignment.Left
+})
 
 -- player tabs
 local movement = tabs.player:CreateSection("movement")
@@ -209,6 +285,15 @@ movement:CreateToggle("jump-enable", {
 
 local character = tabs.player:CreateSection("character")
 
+character:CreateToggle("no-ragdoll", {
+    Title = "no-ragdoll",
+    Description = "", 
+    Default = false,
+    Callback = function(state)
+        IS_FLAGS["player"]["no-ragdoll"] = state
+    end
+})
+
 character:CreateToggle("no-clip", {
     Title = "no-clip",
     Description = "", 
@@ -247,9 +332,9 @@ combat:CreateSlider("player-hit-distance", {
 combat:CreateSlider("punch-hit-delay", {
     Title = "punch-hit-delay",
     Description = "",
-    Default = 0.25,
+    Default = 0.2,
     Min = 0.2,
-    Max = 0.3,
+    Max = 0.4,
     Rounding = 1,
     Callback = function(value)
         IS_FLAGS["auto"]["punch-hit-delay"] = value
@@ -299,11 +384,11 @@ combat:CreateToggle("kill-boss", {
             local bossNames = get_bossesNames()
 
             if bossNames then
-                for _, v in pairs(Workspace:GetChildren()) do
-                    if v:FindFirstChild("HumanoidRootPart") and table.find(bossNames, v.Name) then
-                        Punch:FireServer(ID, v, v:WaitForChild("HumanoidRootPart"))
+                for _, boss in pairs(Workspace:GetChildren()) do
+                    if table.find(bossNames, boss.Name) then
+                        Punch:FireServer(ID, boss, boss:WaitForChild("HumanoidRootPart"))
                     end
-                end       
+                end
             end
 
             task.wait()
@@ -345,6 +430,36 @@ anti_ability:CreateToggle("anti-jello", {
                         Hitbox.CanTouch = not IS_FLAGS["anti"]["anti-jello"]
                     end
                 end
+            end
+        end
+   end
+})
+
+anti_ability:CreateToggle("anti-slime", {
+   Title = "anti-slime",
+   Description = "",
+   Default = false,
+   Callback = function(state)
+        IS_FLAGS["anti"]["anti-slime"] = state
+
+        for _, v in pairs(Workspace:GetChildren()) do
+            if v.Name == "Slime Block" then
+                v.CanTouch = not IS_FLAGS["anti"]["anti-slime"]
+            end
+        end
+   end
+})
+
+anti_ability:CreateToggle("anti-lava", {
+   Title = "anti-lava",
+   Description = "",
+   Default = false,
+   Callback = function(state)
+        IS_FLAGS["anti"]["anti-lava"] = state
+
+        for _, v in pairs(Workspace:GetChildren()) do
+            if v.Name == "Puddle" and v.Name == "Cookie" then
+                v.CanTouch = not IS_FLAGS["anti"]["anti-lava"]
             end
         end
    end
@@ -405,7 +520,7 @@ toxic:CreateToggle("toxic-chat", {
 
         while IS_FLAGS["misc"]["toxic-chat"] do
             if RBXGeneral then
-                local randomPhrase = Phrases_Chat[math.random(1, #Phrases_Chat)]
+                local randomPhrase = Phrase_Chat[math.random(1, #Phrase_Chat)]
                 RBXGeneral:SendAsync(randomPhrase)
             end
             task.wait(8) -- send a message every 8 seconds
@@ -472,33 +587,50 @@ SaveManager:SetFolder("bobhub/ability-wars")
 InterfaceManager:BuildInterfaceSection(tabs.settings)
 SaveManager:BuildConfigSection(tabs.settings)
 
-Window:SelectTab(2)
+Window:SelectTab(1)
 
 SaveManager:LoadAutoloadConfig()
 
 -- Initialize anti-void part
-task.spawn(function()
-    Part_Void = Instance.new("Part", Workspace)
-    Part_Void.Name = "anti_void"
-    Part_Void.Anchored = true
-    Part_Void.Size = Vector3.new(10000, 10, 10000)
-    Part_Void.CFrame = CFrame.new(0, -2.47101189, 0)
-    Part_Void.Transparency = 1
-    Part_Void.Material = "Neon"
-    Part_Void.CanCollide = false
-    Part_Void.Color = Color3.fromRGB(146, 145, 145)
-end)
+if not Workspace:FindFirstChild("anti_void") then
+    task.spawn(function()
+        Part_Void = Instance.new("Part", Workspace)
+        Part_Void.Name = "anti_void"
+        Part_Void.Anchored = true
+        Part_Void.Size = Vector3.new(10000, 10, 10000)
+        Part_Void.CFrame = CFrame.new(0, -2.6, 0)
+        Part_Void.Transparency = 1
+        Part_Void.Material = "Neon"
+        Part_Void.CanCollide = false
+        Part_Void.Color = Color3.fromRGB(195, 195, 195)
+    end)
+end
 
 -- Event connections
 table.insert(Connections, Workspace.ChildAdded:Connect(function(child)
+    -- anti jello
     if child:IsA("Model") then
-        if child.Name == "Jello Castle" and IS_FLAGS["anti"]["anti-jello"] == true then
-            local Hitbox = child:FindFirstChild("Hitbox") or child:WaitForChild("Hitbox", 5)
-            if Hitbox then
-                Hitbox.CanTouch = false
+        if IS_FLAGS["anti"]["anti-jello"] == true then
+            if child.Name == "Jello Castle" then
+                local Hitbox = child:FindFirstChild("Hitbox") or child:WaitForChild("Hitbox", 5)
+                if Hitbox then
+                    Hitbox.CanTouch = false
+                end
             end
         end
     end
+
+    -- anti slime
+    if child.Name == "Slime Block" and IS_FLAGS["anti"]["anti-slime"] == true then
+        child.CanTouch = false
+    end
+
+    -- anti lava
+    if child.Name == "Puddle" and child.Name == "Cookie" and IS_FLAGS["anti"]["anti-lava"] == true then
+        child.CanTouch = false
+    end
+
+
 end))
 
 table.insert(Connections, LocalPlayer.CharacterAdded:Connect(function(character)
@@ -513,34 +645,26 @@ table.insert(Connections, LocalPlayer.CharacterAdded:Connect(function(character)
 end))
 
 table.insert(Connections, RunService.RenderStepped:Connect(function()
-    for _, child in pairs(Character:GetDescendants()) do
+    for _, child in pairs(LocalPlayer.Character:GetDescendants()) do
         if child:IsA("BasePart") then
             child.CanCollide = not IS_FLAGS["player"]["no-clip"]
         end
     end
-end))
 
-table.insert(Connections, RunService.RenderStepped:Connect(function()
-    local humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-    if humanoid and humanoid.Health > 0 then
-        if IS_FLAGS["player"]["speed-enable"] then
-            humanoid.WalkSpeed = IS_FLAGS["player"]["speed-slider"]
+    if IS_FLAGS["player"]["no-ragdoll"] == true then
+        if LocalPlayer.Character.Humanoid.PlatformStand == true then
+            LocalPlayer.Character.HumanoidRootPart.Anchored = true
         else
-            humanoid.WalkSpeed = 16 -- default walk speed
-        end
-
-        if IS_FLAGS["player"]["jump-enable"] == true then
-            humanoid.JumpPower = IS_FLAGS["player"]["jump-slider"]
-        else
-            humanoid.JumpPower = 50 -- default jump power
+            LocalPlayer.Character.HumanoidRootPart.Anchored = false
         end
     end
 end))
 
+
 --[[
 -- check when ui is destroyed
 local function onDestroy()
-    for _, connection in pairs(Connections) do
+    for _, connection in ipairs(Connections) do
         if connection then
             connection:Disconnect()
         end
@@ -555,3 +679,4 @@ local function onDestroy()
 end
 ]]
 
+Notify("UI loaded successfully", ":D", 5)

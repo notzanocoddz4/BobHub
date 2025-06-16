@@ -11,21 +11,32 @@
 
 __Features:__
 
+#### about tabs
+- add discord-information paragraph: (show image)
+<img src="../Images/discord-information.jpg">
+- add copy-discord-server button
+
+(but, i use discord API for make data) https://discord.com/api/v9/invites/
+
+- add credits paragraph
+
 #### player tabs
 - walkspeed and jump slider 
 - walkspeed and jump toggle 
+- added no-ragdoll toggle
 - added no-clip toggle
 
 #### auto tabs
 - added punch-type dropdown ( options: blatant, legit )
 - fixed punch-aura toggle ( added ingore uno reverse )
-- fixed punch-hit-delay slider ( set: 0.25 to 0.3 )
-- fixed player-hit-distance slider ( set: 0 to 17 ) 20 distance will get banned
+- fixed punch-hit-delay slider ( set: 0.2 to 0.4 )
+- fixed player-hit-distance slider ( set: 0 to 17 )
 - added kill-boss toggle
 
 #### anti tabs
 - added anti-void toggle
 - added anti-jello toggle
+- added anti-slime toggle
 
 #### visuals tabs
 - added disable-name-tag toggle

@@ -1,5 +1,9 @@
 {
     "robloxLsp.diagnostics.globals": [
-        "firetouchinterest"
+        "firetouchinterest",
+        "syn",
+        "http",
+        "request",
+        "setclipboard"
     ]
 }
