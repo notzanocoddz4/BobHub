@@ -1,4 +1,4 @@
-## 06/14/2025
+## 06/21/2025
 
 <img src="https://tr.rbxcdn.com/180DAY-d6f85fbe79e2416623e3140a597b9f32/768/432/Image/Webp/noFilter" style="width: 80%; height: 100%">
 
@@ -21,24 +21,27 @@ __Features:__
 - add credits paragraph
 
 #### player tabs
-- walkspeed and jump slider 
-- walkspeed and jump toggle 
+- fixed walkspeed and jump slider 
+- fixed walkspeed and jump toggle 
 - added no-ragdoll toggle
-- added no-clip toggle
+- remove no-clip toggle
+- added target-move toggle
 
 #### auto tabs
 - added punch-type dropdown ( options: blatant, legit )
 - fixed punch-aura toggle ( added ingore uno reverse )
 - fixed punch-hit-delay slider ( set: 0.2 to 0.4 )
 - fixed player-hit-distance slider ( set: 0 to 17 )
-- added kill-boss toggle
+- fixed kill-boss toggle
 
 #### anti tabs
 - added anti-void toggle
 - added anti-jello toggle
 - added anti-slime toggle
+- added anti-lava toggle
 
 #### visuals tabs
+- added field-of-view slider
 - added disable-name-tag toggle
 
 #### misc tabs

@@ -2,9 +2,7 @@ if game.PlaceId ~= 8260276694 then
     return 
 end
 
-repeat
-    task.wait()
-until game:IsLoaded()
+repeat task.wait() until game:IsLoaded()
 
 local Library = loadstring(game:HttpGetAsync("https://github.com/ActualMasterOogway/Fluent-Renewed/releases/latest/download/Fluent.luau"))()
 local SaveManager = loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/ActualMasterOogway/Fluent-Renewed/master/Addons/SaveManager.luau"))()
@@ -37,6 +35,8 @@ local PlayerScripts = LocalPlayer:WaitForChild('PlayerScripts')
 -- module
 local GUI_Functions = require(PlayerScripts:WaitForChild('GUI Functions'))
 
+local CurrentCamera = Workspace.CurrentCamera
+
 local Arena = Workspace.Portals['Arena Frame']
 local MapItems = Workspace:WaitForChild('Map Items')
 local Secrets = Workspace.Secrets
@@ -51,16 +51,17 @@ local ID = 314159265359; -- i think this is the ID of anti-exploit, but i don't 
 
 local IS_FLAGS = {
     ["player"] = {
-        ["speed-slider"] = 21,
+        ["speed-slider"] = 0,
         ["speed-enable"] = false,
-        ["jump-slider"] = 50,
+        ["jump-slider"] = 0,
         ["jump-enable"] = false,
+        ["inf-jump"] = false,
         ["no-ragdoll"] = false,
-        ["no-clip"] = false,
+        ["target-move"] = false,
     },
     ["auto"] = {
-        ["punch-hit-delay"] = 0.25,
-        ["player-hit-distance"] = 17,
+        ["punch-hit-delay"] = 0,
+        ["player-hit-distance"] = 0,
         ["punch-aura"] = false,
         ["punch-type"] = "blatant",
         ["kill-boss"] = false,
@@ -70,9 +71,9 @@ local IS_FLAGS = {
         ["anti-jello"] = false,
         ["anti-slime"] = false,
         ["anti-lava"] = false,
-        -- ["anti-soap"] = false,
     },
     ["visuals"] = {
+        ["field-of-view"] = 0,
         ["disable-name-tag"] = false,
     },
     ["misc"] = {
@@ -82,7 +83,11 @@ local IS_FLAGS = {
 }
 
 local Part_Void = nil
-local Items = {"Burger", "Cake", "Pizza"}
+local Items = {
+    "Burger", 
+    "Cake", 
+    "Pizza"
+}
 
 local Connections = {}
 
@@ -140,6 +145,25 @@ local Phrase_Chat = {
     "you lost, stop crying.",
 }
 
+function find_target()
+    local nearest_distance, nearest_player = math.huge, nil
+
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer then
+            if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                local distance = LocalPlayer:DistanceFromCharacter(player.Character.HumanoidRootPart.Position)
+
+                if distance <= nearest_distance then
+                    nearest_player = player
+                    nearest_distance = distance
+                end
+            end
+        end
+    end
+
+    return nearest_distance, nearest_player
+end
+
 function get_bossesNames()
     local bossNames = {}
     for _, v in pairs(Bosses:GetChildren()) do
@@ -153,7 +177,7 @@ function discord_Info() -- bobhub server
     local url_inviteAPI = "https://discord.com/api/v9/invites/zr575byvYK?with_counts=true"
     local request = (syn and syn.request) or (http and http.request) or (HttpService and HttpService.RequestAsync) or request
 
-    local content = ""
+    local content = {}
     local success, result = pcall(function()
         local response = request({
             Url = url_inviteAPI,
@@ -199,7 +223,7 @@ local Window = Library:CreateWindow({
 
 -- Creating a tabs of table
 local tabs = {
-    about = Window:CreateTab({ Title = "about", Icon = "info" }),
+    info = Window:CreateTab({ Title = "info", Icon = "info" }),
     player = Window:CreateTab({ Title = "player", Icon = "circle-user-round" }),
     auto = Window:CreateTab({ Title = "auto", Icon = "zap" }),
     anti = Window:CreateTab({ Title = "anti", Icon = "shield-ban" }),
@@ -210,7 +234,7 @@ local tabs = {
 
 -- about tabs
 local data = discord_Info()
-local discord_info = tabs.about:CreateSection("discord-information")
+local discord_info = tabs.info:CreateSection("discord-information")
 
 discord_info:CreateParagraph("discord-info", {
     Title = data.server_name,
@@ -227,10 +251,10 @@ discord_info:CreateButton({
    end 
 })
 
-local credits = tabs.about:CreateSection("credits")
+local credits = tabs.info:CreateSection("credits")
 
 credits:CreateParagraph("dev-credits", {
-    Title = "bobhub team (mmm)",
+    Title = "bobhub dev (mmm)",
     Content = [[
     - notzanocoddz: owner & developer
     ]],
@@ -259,6 +283,10 @@ movement:CreateToggle("speed-enable", {
     Default = false,
     Callback = function(state)
         IS_FLAGS["player"]["speed-enable"] = state
+
+        if not IS_FLAGS["player"]["speed-enable"] then
+            LocalPlayer.Character.Humanoid.WalkSpeed = 21
+        end
     end
 })
 
@@ -280,6 +308,19 @@ movement:CreateToggle("jump-enable", {
     Default = false,
     Callback = function(state)
         IS_FLAGS["player"]["jump-enable"] = state
+
+        if not IS_FLAGS["player"]["jump-enable"] then
+            LocalPlayer.Character.Humanoid.JumpPower = 50
+        end
+    end
+})
+
+movement:CreateToggle("inf-jump", {
+    Title = "inf-jump",
+    Description = "", 
+    Default = false,
+    Callback = function(state)
+        IS_FLAGS["player"]["inf-jump"] = state
     end
 })
 
@@ -294,12 +335,28 @@ character:CreateToggle("no-ragdoll", {
     end
 })
 
-character:CreateToggle("no-clip", {
-    Title = "no-clip",
+character:CreateToggle("target-move", {
+    Title = "target-move",
     Description = "", 
     Default = false,
     Callback = function(state)
-        IS_FLAGS["player"]["no-clip"] = state
+        IS_FLAGS["player"]["target-move"] = state
+
+        while IS_FLAGS["player"]["target-move"] do
+            local _, target = find_target()
+            local location
+
+            if not GUI_Functions.PlayerModifiers.Started == true then
+                location = Arena.Portal.Position
+            else
+                location = target.Character.HumanoidRootPart.Position
+            end
+            
+            if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
+                LocalPlayer.Character.Humanoid:MoveTo(location)
+            end
+            task.wait()
+        end
     end
 })
 
@@ -350,7 +407,7 @@ combat:CreateToggle("punch-aura", {
 
         repeat
             task.wait(IS_FLAGS["auto"]["punch-hit-delay"])
-            for k, v in next, Players:GetPlayers() do
+            for _, v in next, Players:GetPlayers() do
                 if v ~= LocalPlayer then
                     local Character = v.Character
                                                                                     -- ingore uno reverse
@@ -466,6 +523,18 @@ anti_ability:CreateToggle("anti-lava", {
 })
 
 -- visuals tabs
+tabs.visuals:CreateSlider("field-of-view", {
+    Title = "field-of-view",
+    Description = "",
+    Default = 70,
+    Min = 30,
+    Max = 120,
+    Rounding = 1,
+    Callback = function(value)
+        IS_FLAGS["visuals"]["field-of-view"] = value
+    end
+})
+
 local remove = tabs.visuals:CreateSection("remove")
 
 remove:CreateToggle("disable-name-tag", {
@@ -629,8 +698,6 @@ table.insert(Connections, Workspace.ChildAdded:Connect(function(child)
     if child.Name == "Puddle" and child.Name == "Cookie" and IS_FLAGS["anti"]["anti-lava"] == true then
         child.CanTouch = false
     end
-
-
 end))
 
 table.insert(Connections, LocalPlayer.CharacterAdded:Connect(function(character)
@@ -645,23 +712,31 @@ table.insert(Connections, LocalPlayer.CharacterAdded:Connect(function(character)
 end))
 
 table.insert(Connections, RunService.RenderStepped:Connect(function()
-    for _, child in pairs(LocalPlayer.Character:GetDescendants()) do
-        if child:IsA("BasePart") then
-            child.CanCollide = not IS_FLAGS["player"]["no-clip"]
-        end
+    if IS_FLAGS["player"]["speed-enable"] == true then
+        LocalPlayer.Character.Humanoid.WalkSpeed = IS_FLAGS["player"]["speed-slider"]
     end
 
+    if IS_FLAGS["player"]["jump-enable"] == true then
+        LocalPlayer.Character.Humanoid.JumpPower = IS_FLAGS["player"]["jump-slider"]
+    end
+    
     if IS_FLAGS["player"]["no-ragdoll"] == true then
-        if LocalPlayer.Character.Humanoid.PlatformStand == true then
+        if GUI_Functions.PlayerModifiers.Ragdolled == true then
             LocalPlayer.Character.HumanoidRootPart.Anchored = true
         else
             LocalPlayer.Character.HumanoidRootPart.Anchored = false
         end
     end
+
+    CurrentCamera.FieldOfView = IS_FLAGS["visuals"]["field-of-view"]
 end))
 
+table.insert(Connections, UserInputService.JumpRequest:Connect(function()
+    if IS_FLAGS["player"]["inf-jump"] == true then
+        LocalPlayer.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+    end
+end))
 
---[[
 -- check when ui is destroyed
 local function onDestroy()
     for _, connection in ipairs(Connections) do
@@ -669,14 +744,17 @@ local function onDestroy()
             connection:Disconnect()
         end
     end
-
+    
     if Part_Void then
         Part_Void:Destroy()
         Part_Void = nil
     end
 
-    Notify("Fluent UI", "UI has been destroyed", 5)
-end
-]]
 
-Notify("UI loaded successfully", ":D", 5)
+    CurrentCamera.FieldOfView = 70
+    LocalPlayer.Character:WaitForChild("Head"):FindFirstChild("Name Tag").Enabled = true
+end
+
+while true and task.wait() do; if Library.Unloaded then; onDestroy(); break; end; end;
+
+Notify("Script loaded successfully", ":D", 5)
