@@ -83,11 +83,7 @@ local IS_FLAGS = {
 }
 
 local Part_Void = nil
-local Items = {
-    "Burger", 
-    "Cake", 
-    "Pizza"
-}
+local Items = {"Burger", "Cake", "Pizza"}
 
 local Connections = {}
 
@@ -150,7 +146,8 @@ function find_target()
 
     for _, player in pairs(Players:GetPlayers()) do
         if player ~= LocalPlayer then
-            if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            local HumanoidRootPart = player.Character and player.Character:WaitForChild("HumanoidRootPart")
+            if HumanoidRootPart then
                 local distance = LocalPlayer:DistanceFromCharacter(player.Character.HumanoidRootPart.Position)
 
                 if distance <= nearest_distance then
@@ -352,9 +349,10 @@ character:CreateToggle("target-move", {
                 location = target.Character.HumanoidRootPart.Position
             end
             
-            if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
+            if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
                 LocalPlayer.Character.Humanoid:MoveTo(location)
             end
+
             task.wait()
         end
     end
@@ -377,9 +375,9 @@ combat:CreateDropdown("punch-type", {
 combat:CreateSlider("player-hit-distance", {
     Title = "player-hit-distance",
     Description = "",
-    Default = 17,
-    Min = 0,
-    Max = 17,
+    Default = 18,
+    Min = 10,
+    Max = 18,
     Rounding = 1,
     Callback = function(value)
         IS_FLAGS["auto"]["player-hit-distance"] = value
@@ -389,8 +387,8 @@ combat:CreateSlider("player-hit-distance", {
 combat:CreateSlider("punch-hit-delay", {
     Title = "punch-hit-delay",
     Description = "",
-    Default = 0.2,
-    Min = 0.2,
+    Default = 0.3,
+    Min = 0.3,
     Max = 0.4,
     Rounding = 1,
     Callback = function(value)
@@ -409,7 +407,7 @@ combat:CreateToggle("punch-aura", {
             task.wait(IS_FLAGS["auto"]["punch-hit-delay"])
             for _, v in next, Players:GetPlayers() do
                 if v ~= LocalPlayer then
-                    local Character = v.Character
+                    local Character = v.Character or v.CharacterAdded:Wait()
                                                                                     -- ingore uno reverse
                     if Character and Character:FindFirstChild("HumanoidRootPart") and Character:FindFirstChild("Left Arm"):FindFirstChild("SelectionBox") == nil then
                         local distance = LocalPlayer:DistanceFromCharacter(v.Character.HumanoidRootPart.Position)
@@ -712,19 +710,25 @@ table.insert(Connections, LocalPlayer.CharacterAdded:Connect(function(character)
 end))
 
 table.insert(Connections, RunService.RenderStepped:Connect(function()
-    if IS_FLAGS["player"]["speed-enable"] == true then
-        LocalPlayer.Character.Humanoid.WalkSpeed = IS_FLAGS["player"]["speed-slider"]
-    end
+    local Humanoid = LocalPlayer.Character:WaitForChild("Humanoid")
+    if Humanoid then
+        if IS_FLAGS["player"]["speed-enable"] == true then
+            Humanoid.WalkSpeed = IS_FLAGS["player"]["speed-slider"]
+        end
 
-    if IS_FLAGS["player"]["jump-enable"] == true then
-        LocalPlayer.Character.Humanoid.JumpPower = IS_FLAGS["player"]["jump-slider"]
+        if IS_FLAGS["player"]["jump-enable"] == true then
+            Humanoid.JumpPower = IS_FLAGS["player"]["jump-slider"]
+        end
     end
     
-    if IS_FLAGS["player"]["no-ragdoll"] == true then
-        if GUI_Functions.PlayerModifiers.Ragdolled == true then
-            LocalPlayer.Character.HumanoidRootPart.Anchored = true
-        else
-            LocalPlayer.Character.HumanoidRootPart.Anchored = false
+    local HumanoidRootPart = LocalPlayer.Character:WaitForChild("HumanoidRootPart")
+    if HumanoidRootPart then
+        if IS_FLAGS["player"]["no-ragdoll"] == true then
+            if GUI_Functions.PlayerModifiers.Ragdolled == true then
+                HumanoidRootPart.Anchored = true
+            else
+                HumanoidRootPart.Anchored = false
+            end
         end
     end
 
@@ -737,6 +741,7 @@ table.insert(Connections, UserInputService.JumpRequest:Connect(function()
     end
 end))
 
+--[[
 -- check when ui is destroyed
 local function onDestroy()
     for _, connection in ipairs(Connections) do
@@ -745,6 +750,10 @@ local function onDestroy()
         end
     end
     
+    for _, var in pairs(IS_FLAGS) do
+        print(_, var)
+    end
+
     if Part_Void then
         Part_Void:Destroy()
         Part_Void = nil
@@ -755,6 +764,10 @@ local function onDestroy()
     LocalPlayer.Character:WaitForChild("Head"):FindFirstChild("Name Tag").Enabled = true
 end
 
-while true and task.wait() do; if Library.Unloaded then; onDestroy(); break; end; end;
-
-Notify("Script loaded successfully", ":D", 5)
+while true and task.wait() do 
+    if Library.Unloaded then 
+        onDestroy() 
+        break 
+    end 
+end 
+]]

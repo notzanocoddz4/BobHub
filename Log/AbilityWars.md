@@ -21,8 +21,8 @@ __Features:__
 - add credits paragraph
 
 #### player tabs
-- fixed walkspeed and jump slider 
-- fixed walkspeed and jump toggle 
+- added walkspeed and jump slider 
+- added walkspeed and jump toggle 
 - added no-ragdoll toggle
 - remove no-clip toggle
 - added target-move toggle
@@ -30,8 +30,8 @@ __Features:__
 #### auto tabs
 - added punch-type dropdown ( options: blatant, legit )
 - fixed punch-aura toggle ( added ingore uno reverse )
-- fixed punch-hit-delay slider ( set: 0.2 to 0.4 )
-- fixed player-hit-distance slider ( set: 0 to 17 )
+- fixed punch-hit-delay slider (set: 0.3, min: 0.3, max: 0.4 )
+- fixed player-hit-distance slider ( set: 18, min: 10, max: 18 )
 - fixed kill-boss toggle
 
 #### anti tabs
