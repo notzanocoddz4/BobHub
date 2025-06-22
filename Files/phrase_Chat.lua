@@ -1,4 +1,4 @@
-local Phrases_Chat = {
+return {
     -- made by hqt and zano make pharases
     "you are no match for my skill, go cry to your daddy about losing",
     "you're useless and loud-bad combo.",
@@ -10,5 +10,3 @@ local Phrases_Chat = {
     "you cant beat me even with good abilities, noob",
     "you lost, stop crying.",
 }
-
-return Phrases_Chat

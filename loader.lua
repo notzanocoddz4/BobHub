@@ -1,7 +1,7 @@
 local pid = game.PlaceId
 local LocalPlayer = game.Players.LocalPlayer
 
-local ID_tbl = { [8260276694] = true }
+local ID_tbl = { [8260276694] = true, [6403373529] = true }
 
 local function load(id:number)
     local s, r = pcall(function()
