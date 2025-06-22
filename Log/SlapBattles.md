@@ -23,6 +23,7 @@ __Features:__
 - added no-ragdoll toggle
 
 #### auto tabs
+- added player-hit-distance ( set: 20, min: 10, max: 20 )
 - added slap-aura toggle ( hit 1 second )
 
 #### anti tabs
