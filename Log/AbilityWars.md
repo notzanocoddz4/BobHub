@@ -46,5 +46,5 @@ __Features:__
 
 #### misc tabs
 - fixed teleport-arena toggle
-- added toxic-chat
+- added toxic-chat toggle
 - added get badge button ( get-backrooms, get-cake, get-boring, get-grocery-shopping )

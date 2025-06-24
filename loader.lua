@@ -1,19 +1,31 @@
-local pid = game.PlaceId
-local LocalPlayer = game.Players.LocalPlayer
+local server_Link = "https://discord.gg/zr575byvYK";
 
-local ID_tbl = { [8260276694] = true, [6403373529] = true }
+local Place_ID = game.PlaceId
+local LocalPlayer = game:GetService("Players").LocalPlayer
+local UserInputService = game:GetService('UserInputService');
 
-local function load(id:number)
-    local s, r = pcall(function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/notzanocoddz4/BobHub/main/Place/".. id ..".lua"))()
-    end)
-    if s then
-        print('successfully load script')
-    end
+local discordInviter = loadstring(game:HttpGet("https://raw.githubusercontent.com/RegularVynixu/Utilities/main/Discord%20Inviter/Source.lua"))()
+
+local Supported_Games = {
+	[8260276694] = "Ability_Wars", 
+	[6403373529] = "Slap_Battles", [124596094333302] = "Slap_Battles",
+}
+
+local function load(id)
+	local s, r = pcall(function()
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/notzanocoddz4/BobHub/main/Place/".. id ..".lua"))()
+	end)
+	if s then
+		print('Successfully loaded script for: ' .. id)
+	end
 end
 
-if ID_tbl[pid] == true then
-    load(pid)
+if Supported_Games[Place_ID] ~= nil then
+	load(Supported_Games[Place_ID])
 else
-    LocalPlayer:Kick("not supported")
+	LocalPlayer:Kick("\nThe current game is not supported.\n\nCheck the discord for the list of supported games!")
+    
+    if UserInputService:GetPlatform() == Enum.Platform.PC then
+        discordInviter.Join(server_Link)
+    end
 end

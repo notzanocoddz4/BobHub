@@ -20,14 +20,14 @@ __Features:__
 #### player tabs
 - added walkspeed and jump slider 
 - added walkspeed and jump toggle 
-- added no-ragdoll toggle
+- fixed no-ragdoll toggle
 
 #### auto tabs
-- added slap-aura toggle ( hit 1 second )
+- fixed slap-aura toggle ( hit 1 second )
 
 #### anti tabs
 - added anti-void toggle
 
 #### misc tabs
-- added teleport-arena toggle
-- added toxic-chat
+- fixed teleport-arena toggle
+- added toxic-chat toggle

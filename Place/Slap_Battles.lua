@@ -29,7 +29,7 @@ local Workspace = game:GetService('Workspace');
 local LocalPlayer = Players.LocalPlayer
 local CurrentCamera = Workspace.CurrentCamera
 
-local Lobby = Workspace.Lobby
+local Arena = Workspace.Lobby:WaitForChild("Teleport1") -- its arena normal
 
 local RBXGeneral = TextChatService.TextChannels.RBXGeneral
 
@@ -359,18 +359,16 @@ combat:CreateToggle("slap-aura", {
         IS_FLAGS["auto"]["slap-aura"] = state
 
         repeat
-            task.wait(0.9)
+            task.wait(0.92)
             for _, v in next, Players:GetPlayers() do
                 if v ~= LocalPlayer then
-                    if LocalPlayer.Character:FindFirstChild("isInArena").Value == true then
-                        local Character = v.Character or v.CharacterAdded:Wait()
-                        if Character and Character:FindFirstChild("HumanoidRootPart") then
-                            local distance = LocalPlayer:DistanceFromCharacter(v.Character.HumanoidRootPart.Position)
+                    local isInArena = LocalPlayer.Character:FindFirstChild("isInArena")
+                    if isInArena and isInArena.Value == true then
+                        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                            local distance = LocalPlayer:DistanceFromCharacter(v.Character:WaitForChild("HumanoidRootPart").Position)
 
                             if distance <= tonumber(IS_FLAGS["auto"]["player-hit-distance"]) then
-                                -- if Character.Ragdolled.Value == false then
-                                    gloveHits[get_Glove()]:FireServer(Character:WaitForChild("HumanoidRootPart"))
-                                -- end
+                                gloveHits[get_Glove()]:FireServer(v.Character:WaitForChild("HumanoidRootPart"))
                             end
                         end
                     end
@@ -412,11 +410,13 @@ teleport:CreateToggle("teleport-arena", {
         IS_FLAGS["misc"]["teleport-arena"] = state
 
         while IS_FLAGS["misc"]["teleport-arena"] do
-            if not LocalPlayer.Character:FindFirstChild("isInArena").Value == true then
-                if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-                    firetouchinterest(LocalPlayer.Character.HumanoidRootPart, Lobby.Teleport1, 0)
-                    task.wait(.1)
-                    firetouchinterest(LocalPlayer.Character.HumanoidRootPart, Lobby.Teleport1, 1)
+            if LocalPlayer.Character:FindFirstChild("isInArena") then
+                if not LocalPlayer.Character.isInArena.Value == true then
+                    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                        firetouchinterest(LocalPlayer.Character:WaitForChild("HumanoidRootPart"), Arena, 0)
+                        task.wait()
+                        firetouchinterest(LocalPlayer.Character:WaitForChild("HumanoidRootPart"), Arena, 1)
+                    end
                 end
             end
             task.wait()
@@ -471,7 +471,8 @@ table.insert(Connections, RunService.RenderStepped:Connect(function()
     local HumanoidRootPart = LocalPlayer.Character:WaitForChild("HumanoidRootPart")
     if HumanoidRootPart then
         if IS_FLAGS["player"]["no-ragdoll"] == true then
-            if LocalPlayer.Character:FindFirstChild("Ragdolled").Value == true then
+            local Ragdolled = LocalPlayer.Character:FindFirstChild("Ragdolled")
+            if Ragdolled and Ragdolled.Value == true then
                 HumanoidRootPart.Anchored = true
             else
                 HumanoidRootPart.Anchored = false
