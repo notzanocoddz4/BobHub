@@ -365,10 +365,11 @@ combat:CreateToggle("slap-aura", {
                     local isInArena = LocalPlayer.Character:FindFirstChild("isInArena")
                     if isInArena and isInArena.Value == true then
                         if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-                            local distance = LocalPlayer:DistanceFromCharacter(v.Character:WaitForChild("HumanoidRootPart").Position)
+                            local Character = v.Character or v.CharacterAdded:Wait()
+                            local distance = LocalPlayer:DistanceFromCharacter(Character:WaitForChild("HumanoidRootPart").Position)
 
                             if distance <= tonumber(IS_FLAGS["auto"]["player-hit-distance"]) then
-                                gloveHits[get_Glove()]:FireServer(v.Character:WaitForChild("HumanoidRootPart"))
+                                gloveHits[get_Glove()]:FireServer(Character:WaitForChild("HumanoidRootPart"))
                             end
                         end
                     end
