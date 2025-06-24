@@ -1,6 +1,8 @@
+--[[
 if game.PlaceId ~= 6403373529 then
     return
 end
+]]
 
 repeat task.wait() until game:IsLoaded()
 
