@@ -1,4 +1,4 @@
-## 06/22/2025
+## 06/24/2025
 
 <img src="https://tr.rbxcdn.com/180DAY-60eb7c6c62e307274e4c47f3d46754a7/768/432/Image/Webp/noFilter" style="width: 100%; height: 100%">
 
@@ -23,7 +23,8 @@ __Features:__
 - fixed no-ragdoll toggle
 
 #### auto tabs
-- fixed slap-aura toggle ( hit 1 second )
+- fixed slap-aura toggle
+- added player-hit-distance ( set: 20, min: 10, max: 20 )
 
 #### anti tabs
 - added anti-void toggle
