@@ -25,7 +25,7 @@ if Supported_Games[Place_ID] ~= nil then
 else
 	LocalPlayer:Kick("\nThe current game is not supported.\n\nCheck the discord for the list of supported games!")
 	
-    if UserInputService:GetPlatform() == Enum.Platform.Windows then
-        discordInviter.Join(server_Link)
-    end
+	if UserInputService:GetPlatform() == Enum.Platform.Windows then
+        	discordInviter.Join(server_Link)
+    	end
 end
