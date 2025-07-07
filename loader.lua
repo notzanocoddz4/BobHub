@@ -30,8 +30,4 @@ else
 	if UserInputService:GetPlatform() == Enum.Platform.Windows then
         	discordInviter.Join(server_Link)
     	end
-<<<<<<< HEAD
 end
-=======
-end
->>>>>>> 3363b2c1d69880988d94dba8450fa30e7d49aaab
