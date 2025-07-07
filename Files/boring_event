@@ -1,2 +1,0 @@
---free boring bagde
-game:GetService("ReplicatedStorage")["Remote Events"].BigMushroomEvent:FireServer()

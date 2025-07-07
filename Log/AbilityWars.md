@@ -15,14 +15,11 @@ __Features:__
 - add discord-information paragraph: (show image)
 <img src="../Images/discord-information.jpg">
 - add copy-discord-server button
-
-(but, i use discord API for make data) https://discord.com/api/v9/invites/
-
 - add credits paragraph
 
 #### player tabs
-- added walkspeed and jump slider 
-- added walkspeed and jump toggle 
+- added speed and jump slider
+- added speed and jump toggle 
 - added no-ragdoll toggle
 - remove no-clip toggle
 - added target-move toggle

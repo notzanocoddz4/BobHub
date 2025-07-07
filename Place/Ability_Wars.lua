@@ -241,7 +241,7 @@ local credits = tabs.info:CreateSection("credits")
 credits:CreateParagraph("dev-credits", {
     Title = "bobhub dev (mmm)",
     Content = [[
-    - notzanocoddz: owner & developer
+    - notzanocoddz: creator & developer
     ]],
     TitleAlignment = "Left",
     ContentAlignment = Enum.TextXAlignment.Left

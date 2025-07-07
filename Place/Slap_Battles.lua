@@ -1,8 +1,19 @@
+--[[
 if game.PlaceId ~= 6403373529 then
     return
 end
+]]
 
 repeat task.wait() until game:IsLoaded()
+
+-- disable killfeed bin
+for i, v in pairs(game.Players.LocalPlayer.PlayerGui:GetDescendants()) do
+    if v:IsA("Frame") then
+        if v.Name == "KillfeedBin" then
+            v.Visible = false
+        end
+    end
+end
 
 local Library = loadstring(game:HttpGetAsync("https://github.com/ActualMasterOogway/Fluent-Renewed/releases/latest/download/Fluent.luau"))()
 local SaveManager = loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/ActualMasterOogway/Fluent-Renewed/master/Addons/SaveManager.luau"))()
@@ -43,10 +54,14 @@ local IS_FLAGS = {
     },
     ["auto"] = {
         ["player-hit-distance"] = 0,
+        ["slap-hit-delay"] = 0,
         ["slap-aura"] = false,
     },
     ["anti"] = {
         ["anti-void"] = false,
+    },
+    ["visuals"] = {
+        ["disable-name-tag"] = true,
     },
     ["misc"] = {
         ["teleport-arena"] = false,
@@ -237,7 +252,7 @@ local tabs = {
     player = Window:CreateTab({ Title = "player", Icon = "circle-user-round" }),
     auto = Window:CreateTab({ Title = "auto", Icon = "zap" }),
     anti = Window:CreateTab({ Title = "anti", Icon = "shield-ban" }),
-    -- visuals = Window:CreateTab({ Title = "visuals", Icon = "eye" }),
+    visuals = Window:CreateTab({ Title = "visuals", Icon = "eye" }),
     misc = Window:CreateTab({ Title = "misc", Icon = "folder-open" }),
     settings = Window:CreateTab({ Title = "settings", Icon = "settings" })
 }
@@ -266,7 +281,7 @@ local credits = tabs.info:CreateSection("credits")
 credits:CreateParagraph("dev-credits", {
     Title = "bobhub dev (mmm)",
     Content = [[
-    - notzanocoddz: owner & developer
+    - notzanocoddz: creator & developer
     ]],
     TitleAlignment = "Left",
     ContentAlignment = Enum.TextXAlignment.Left
@@ -351,6 +366,18 @@ combat:CreateSlider("player-hit-distance", {
     end
 })
 
+combat:CreateSlider("slap-hit-delay", {
+    Title = "slap-hit-delay",
+    Description = "",
+    Default = 0.8,
+    Min = 0.5,
+    Max = 1,
+    Rounding = 1,
+    Callback = function(value)
+        IS_FLAGS["auto"]["slap-hit-delay"] = value
+    end
+})
+
 combat:CreateToggle("slap-aura", {
    Title = "slap-aura",
    Description = "",
@@ -359,7 +386,7 @@ combat:CreateToggle("slap-aura", {
         IS_FLAGS["auto"]["slap-aura"] = state
 
         repeat
-            task.wait(0.92)
+            task.wait(IS_FLAGS["auto"]["slap-hit-delay"])
             for _, v in next, Players:GetPlayers() do
                 if v ~= LocalPlayer then
                     local isInArena = LocalPlayer.Character:FindFirstChild("isInArena")
@@ -398,6 +425,27 @@ anti_world:CreateToggle("anti-void", {
 })
 
 -- local anti_glove = tabs.anti:CreateSection("anti-glove")
+
+-- visuals tabs
+local remove = tabs.visuals:CreateSection("remove")
+
+remove:CreateToggle("disable-name-tag", {
+   Title = "disable-name-tag",
+   Description = "",
+   Default = true,
+   Callback = function(state)
+        IS_FLAGS["visuals"]["disable-name-tag"] = state
+            
+        local head = LocalPlayer.Character:FindFirstChild("Head")
+        if head then
+            local nameTag = head:FindFirstChild("Nametag")
+            
+            if nameTag then
+                nameTag.Enabled = not IS_FLAGS["visuals"]["disable-name-tag"]
+            end
+        end
+   end
+})
 
 -- misc tabs
 local teleport = tabs.misc:CreateSection("teleport")
@@ -455,6 +503,17 @@ SaveManager:BuildConfigSection(tabs.settings)
 Window:SelectTab(1)
 
 SaveManager:LoadAutoloadConfig()
+
+table.insert(Connections, LocalPlayer.CharacterAdded:Connect(function(child)
+    task.spawn(function()
+        repeat task.wait() until child:FindFirstChild("Head")
+        local Nametag = child.Head:FindFirstChild("Nametag")
+
+        if Nametag then
+            Nametag.Enabled = not IS_FLAGS["visuals"]["disable-name-tag"]
+        end
+    end)
+end))
 
 table.insert(Connections, RunService.RenderStepped:Connect(function()
     local Humanoid = LocalPlayer.Character:WaitForChild("Humanoid")

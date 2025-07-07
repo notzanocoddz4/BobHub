@@ -4,6 +4,8 @@
         "syn",
         "http",
         "request",
-        "setclipboard"
+        "setclipboard",
+        "hookmetamethod",
+        "getnamecallmethod"
     ]
 }
