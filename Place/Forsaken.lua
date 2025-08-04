@@ -72,7 +72,7 @@ local Color = {
 }
 
 -- esp library by bocaj111004
-local ESPLibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/bocaj111004/ESPLibrary/main/main.lua"))()
+local ESPLibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/bocaj111004/ESPLibrary/refs/heads/main/Library.lua"))()
 
 function discord_Info() -- bobhub server
     local url_inviteAPI = "https://discord.com/api/v9/invites/zr575byvYK?with_counts=true"
